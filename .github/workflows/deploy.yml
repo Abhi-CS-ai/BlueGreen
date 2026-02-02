@@ -36,12 +36,16 @@ jobs:
           fi
           echo "Deploying to $IDLE environment"
           docker compose -f deploy/docker-compose.${IDLE}.yml up -d --build
+      
+      - name: Start Nginx reverse proxy
+        run: |
+          docker compose -p backend-network -f deploy/docker-compose.nginx.yml up -d
 
       - name: Switch traffic
         run: |
           chmod +x deploy/switch.sh
           ./deploy/switch.sh
 
-      - name: Verify deployment
+      - name: Verify deployments
         run: |
           curl -f http://localhost/version
