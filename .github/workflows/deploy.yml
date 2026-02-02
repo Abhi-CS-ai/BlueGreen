@@ -9,7 +9,7 @@ name: CI/CD Blue-Green Deployment
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-sss
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
