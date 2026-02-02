@@ -9,7 +9,7 @@ name: CI/CD Blue-Green Deployment
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-
+sss
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,6 +38,9 @@ jobs:
         run: |
           docker compose -p backend-network -f deploy/docker-compose.nginx.yml up -d
 
+      - name: Wait for Nginx stability
+        run: sleep 5  # <--- Add this line
+  
       - name: Switch traffic
         run: |
           chmod +x deploy/switch.sh
