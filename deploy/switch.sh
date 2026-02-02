@@ -11,28 +11,24 @@ fi
 
 echo "Switching traffic from $ACTIVE_ENV to $NEW_ENV"
 
-# Update upstream config
 cat > nginx/conf.d/upstream.conf <<EOF
 upstream backend {
     server backend-${NEW_ENV}:3000;
 }
 EOF
 
-# Update active environment
 echo "$NEW_ENV" > deploy/active_env
 
-# Dynamically find nginx container
+# Find nginx container via compose label (bulletproof)
 NGINX_CONTAINER=$(docker ps \
-  --filter "ancestor=nginx:1.25-alpine" \
+  --filter "label=com.docker.compose.service=nginx" \
   --format "{{.Names}}" | head -n 1)
 
 if [ -z "$NGINX_CONTAINER" ]; then
-  echo "ERROR: Nginx container not found"
+  echo "ERROR: Nginx container not running"
   exit 1
 fi
 
-# Reload nginx safely
 docker exec "$NGINX_CONTAINER" nginx -s reload
 
 echo "Traffic successfully switched to $NEW_ENV"
-
