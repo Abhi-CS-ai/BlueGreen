@@ -1,6 +1,7 @@
+---
 name: CI/CD Blue-Green Deployment
 
-on:
+"on":
   push:
     branches:
       - main
