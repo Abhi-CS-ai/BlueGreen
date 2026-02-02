@@ -8,7 +8,7 @@ name: CI/CD Blue-Green Deployment
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+   runs-on: self-hosted
 
     steps:
       - name: Checkout code
