@@ -8,7 +8,7 @@ name: CI/CD Blue-Green Deployment
 
 jobs:
   build-and-deploy:
-   runs-on: self-hosted
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -28,7 +28,6 @@ jobs:
 
       - name: Deploy to idle environment
         run: |
-          # Determine active env
           ACTIVE=$(cat deploy/active_env)
           if [ "$ACTIVE" = "blue" ]; then
             IDLE="green"
@@ -36,9 +35,7 @@ jobs:
             IDLE="blue"
           fi
           echo "Deploying to $IDLE environment"
-
-          # Build and run idle container
-          docker-compose -f deploy/docker-compose.${IDLE}.yml up -d --build
+          docker compose -f deploy/docker-compose.${IDLE}.yml up -d --build
 
       - name: Switch traffic
         run: |
