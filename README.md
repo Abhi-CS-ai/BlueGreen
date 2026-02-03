@@ -61,17 +61,17 @@ Ensure the following are installed:
 
 ## ▶️ Running the Project Locally
 
-### 1️⃣ Clone the Repository
+### 1️⃣ Steps
 
 ```bash
 git clone https://github.com/your-username/blue-green-deployment.git
 cd blue-green-deployment
 
-2. Create the Docker Network
+### 2. Create the Docker Network
 
 docker network create backend-network
 
-3. Start Blue & Green Backends
+### 3. Start Blue & Green Backends
 
 docker compose -p backend-network -f deploy/docker-compose.blue.yml up -d
 docker compose -p backend-network -f deploy/docker-compose.green.yml up -d
