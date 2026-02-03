@@ -59,36 +59,34 @@ Ensure the following are installed:
 
 ---
 
-## ▶️ Running the Project Locally
+## ▶️ Setup & Installation
 
-### 1️⃣ Steps
-
+### 1. Clone & Prepare
 ```bash
-git clone https://github.com/your-username/blue-green-deployment.git
-cd blue-green-deployment
+git clone [https://github.com/Abhi-CS-ai/Blue-Green-Deployment.git](https://github.com/Abhi-CS-ai/Blue-Green-Deployment.git)
+cd Blue-Green-Deployment
+chmod +x deploy/switch.sh
 
 ### 2. Create the Docker Network
 
 docker network create backend-network
 
-### 3. Start Blue & Green Backends
+# Start Backends
+docker compose -p bluegreen -f deploy/docker-compose.blue.yml up -d
+docker compose -p bluegreen -f deploy/docker-compose.green.yml up -d
 
-docker compose -p backend-network -f deploy/docker-compose.blue.yml up -d
-docker compose -p backend-network -f deploy/docker-compose.green.yml up -d
+# Start Load Balancer
+docker compose -p bluegreen -f deploy/docker-compose.nginx.yml up -d
 
-4. Start Nginx Reverse Proxy
-
-docker compose -p backend-network -f deploy/docker-compose.nginx.yml up -d
-
-5. Verify the Deployment
+# 5. Verify the Deployment
 
 curl http://localhost/version
 
-## Switching Traffic Manually
+# Switching Traffic Manually
 
 chmod +x deploy/switch.sh
 ./deploy/switch.sh
 
-## Rollback Strategy
+# Rollback Strategy
 
 ./deploy/switch.sh
