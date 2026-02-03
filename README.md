@@ -66,7 +66,7 @@ Ensure the following are installed:
 git clone [https://github.com/Abhi-CS-ai/Blue-Green-Deployment.git](https://github.com/Abhi-CS-ai/Blue-Green-Deployment.git)
 cd Blue-Green-Deployment
 chmod +x deploy/switch.sh
-
+```
 **2. Create the Docker Network**
 
 docker network create backend-network
