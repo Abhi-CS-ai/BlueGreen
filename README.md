@@ -67,26 +67,26 @@ git clone [https://github.com/Abhi-CS-ai/Blue-Green-Deployment.git](https://gith
 cd Blue-Green-Deployment
 chmod +x deploy/switch.sh
 
-### 2. Create the Docker Network
+**2. Create the Docker Network**
 
 docker network create backend-network
 
-# Start Backends
+**Start Backends**
 docker compose -p bluegreen -f deploy/docker-compose.blue.yml up -d
 docker compose -p bluegreen -f deploy/docker-compose.green.yml up -d
 
-# Start Load Balancer
+**Start Load Balancer**
 docker compose -p bluegreen -f deploy/docker-compose.nginx.yml up -d
 
-# 5. Verify the Deployment
+**5. Verify the Deployment**
 
 curl http://localhost/version
 
-# Switching Traffic Manually
+**Switching Traffic Manually**
 
 chmod +x deploy/switch.sh
 ./deploy/switch.sh
 
-# Rollback Strategy
+**Rollback Strategy**
 
 ./deploy/switch.sh
