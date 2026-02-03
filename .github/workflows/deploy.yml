@@ -8,44 +8,78 @@ name: CI/CD Blue-Green Deployment
 
 jobs:
   build-and-deploy:
+    # Self-hosted runner (your machine / server)
     runs-on: self-hosted
 
     steps:
+      # 1️⃣ Checkout repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2️⃣ Enable Docker Buildx (modern Docker builds)
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      # 3️⃣ Build backend Docker image
+      # Image is tagged using short commit SHA for traceability
       - name: Build Docker image
         run: |
           IMAGE_TAG=backend-app:${GITHUB_SHA::7}
           docker build -t $IMAGE_TAG ./app
 
+      # 4️⃣ Deploy to the IDLE environment
+      # 🔑 IMPORTANT CHANGE:
+      # - State is now read from /opt/bluegreen/active_env
+      # - This file persists across CI runs
+      # - deploy/active_env is NO LONGER used
       - name: Deploy to idle environment
         run: |
-          ACTIVE=$(cat deploy/active_env)
+          STATE_FILE="/opt/bluegreen/active_env"
+
+          # Initialize state if this is the first run
+          if [ ! -f "$STATE_FILE" ]; then
+            echo "green" > "$STATE_FILE"
+          fi
+
+          ACTIVE=$(cat "$STATE_FILE")
+
           if [ "$ACTIVE" = "blue" ]; then
             IDLE="green"
           else
             IDLE="blue"
           fi
 
-          docker compose -f deploy/docker-compose.${IDLE}.yml up -d --build
+          echo "Active environment: $ACTIVE"
+          echo "Deploying to idle environment: $IDLE"
 
-      # ✅ ADD THIS STEP HERE
+          docker compose -p backend-network \
+            -f deploy/docker-compose.${IDLE}.yml \
+            up -d --build
+
+      # 5️⃣ Ensure Nginx reverse proxy is running
+      # 🔑 Explicitly started in CI so switch.sh never fails
       - name: Start Nginx reverse proxy
         run: |
-          docker compose -p backend-network -f deploy/docker-compose.nginx.yml up -d
+          docker compose -p backend-network \
+            -f deploy/docker-compose.nginx.yml \
+            up -d
 
+      # 6️⃣ Give Nginx a few seconds to fully initialize
       - name: Wait for Nginx stability
-        run: sleep 5  # <--- Add this line
-  
+        run: sleep 5
+
+      # 7️⃣ Switch traffic from active → idle environment
+      # 🔑 switch.sh:
+      # - Reads state from /opt/bluegreen/active_env
+      # - Updates nginx upstream
+      # - Reloads nginx safely
       - name: Switch traffic
         run: |
           chmod +x deploy/switch.sh
           ./deploy/switch.sh
 
+      # 8️⃣ Verify deployment
+      # Confirms traffic is routed to the new environment
       - name: Verify deployment
         run: |
           curl -f http://localhost/version
