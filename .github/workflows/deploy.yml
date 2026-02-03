@@ -54,7 +54,7 @@ jobs:
 
           docker compose -p backend-network \
             -f deploy/docker-compose.${IDLE}.yml \
-            up -d --build
+            up -d --build --remove -orphans
 
       # 5️⃣ Ensure Nginx reverse proxy is running
       # 🔑 Explicitly started in CI so switch.sh never fails

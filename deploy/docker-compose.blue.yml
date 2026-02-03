@@ -1,7 +1,7 @@
 services:
   backend-blue:
     image: backend-app:1.1
-    container_name: backend-blue
+    #container_name: backend-blue
     environment:
       - PORT=3000
       - APP_VERSION=blue
